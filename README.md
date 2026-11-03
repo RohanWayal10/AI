@@ -21,18 +21,30 @@ Graph used: `A→{B,C}, B→{D,E}, C→{F}, D→{G}, E→{G}, F→{G}`, start = 
  
 ### Algorithm
  
-1. Start with the start node and the goal node.
-2. Create a queue and insert the path containing only the start node.
-3. Create an empty visited set and set nodes explored to 0.
-4. Remove the first path from the queue and take its last node.
-5. If this node is already visited, skip it and go to Step 4.
-6. Mark the node as visited and increase nodes explored by 1.
-7. If the node is the goal, return the path and stop.
-8. Otherwise, add each unvisited neighbour to the END of the queue as a new path (current path + neighbour).
-9. Repeat Steps 4 to 8 until the queue is empty.
-10. If the queue becomes empty without reaching the goal, report that no path exists.
-11. Record path length, nodes explored and execution time.
-12. Stop.
+1. Start with the start node and goal node; put the start path in a queue (FIFO).
+2. Create an empty visited set and set nodes explored = 0.
+3. Remove the first path from the queue and take its last node.
+4. If the node is already visited, skip it; otherwise mark it visited and increase nodes explored.
+5. If the node is the goal, return the path and go to Step 8.
+6. Add every unvisited neighbour to the END of the queue as a new path.
+7. Repeat Steps 3 to 6 until the queue is empty (then report no path).
+8. Record path length, nodes explored and time. Stop.
+### Advantages
+ 
+- Complete: always finds a solution if one exists in a finite graph.
+- Optimal for equal-cost edges: gives the path with the fewest edges.
+- Simple to implement and easy to understand.
+### Disadvantages
+ 
+- High memory use, O(b^d): stores every node of a level.
+- Slow on large or deep graphs.
+- Ignores edge costs, so not optimal for weighted graphs.
+### Applications
+ 
+- Shortest-path routing in unweighted maps and networks.
+- Maze solving and puzzle solving (e.g. 8-puzzle).
+- Web crawlers and social-network friend suggestions (degrees of separation).
+- Network broadcasting and peer-to-peer discovery.
 ### Conclusion
 BFS returned **A → B → D → G**, path length **3**, exploring **7 nodes** (A, B, C, D, E, F, G). It guarantees the shortest path in number of edges but expands many nodes and needs more memory. BFS is the right choice when the shortest path matters and memory is affordable.
  
@@ -59,18 +71,30 @@ DFS expands the **deepest** unexpanded node first using a **stack (LIFO)** or re
 - **Time:** O(b^m); **Space:** O(bm), m = maximum depth (far less memory than BFS).
 ### Algorithm
  
-1. Start with the start node and the goal node.
-2. Create a stack and push the path containing only the start node.
-3. Create an empty visited set and set nodes explored to 0.
-4. Pop the top path from the stack and take its last node.
-5. If this node is already visited, skip it and go to Step 4.
-6. Mark the node as visited and increase nodes explored by 1.
-7. If the node is the goal, return the path and stop.
-8. Otherwise, push each unvisited neighbour onto the TOP of the stack as a new path, in reverse order so the left-most neighbour is explored first.
-9. Repeat Steps 4 to 8 until the stack is empty.
-10. If the stack becomes empty without reaching the goal, report that no path exists.
-11. Record path length, nodes explored and execution time and compare with BFS.
-12. Stop.
+1. Start with the start node and goal node; push the start path onto a stack (LIFO).
+2. Create an empty visited set and set nodes explored = 0.
+3. Pop the top path from the stack and take its last node.
+4. If the node is already visited, skip it; otherwise mark it visited and increase nodes explored.
+5. If the node is the goal, return the path and go to Step 8.
+6. Push every unvisited neighbour onto the TOP of the stack (in reverse order).
+7. Repeat Steps 3 to 6 until the stack is empty (then report no path).
+8. Record path length, nodes explored and time and compare with BFS. Stop.
+### Advantages
+ 
+- Low memory use, O(bm): stores only the current path.
+- Can reach deep goals quickly, as seen here (4 nodes vs 7).
+- Easy to implement with a stack or recursion.
+### Disadvantages
+ 
+- Not optimal: may return a longer path.
+- Can go down very deep or infinite branches; needs a visited check.
+- Not guaranteed to be complete on infinite graphs.
+### Applications
+ 
+- Maze generation and solving.
+- Cycle detection and topological sorting.
+- Finding connected components and solving puzzles such as Sudoku.
+- Game-tree exploration and web crawling to a depth.
 ### Conclusion
 DFS returned **A → B → D → G**, length **3**, exploring only **4 nodes** versus 7 for BFS. The equal path length is a property of this small graph, not a rule: DFS gives **no** shortest-path guarantee, BFS does. Use BFS for shortest paths; DFS when memory is limited or any solution is acceptable.
  
@@ -101,28 +125,38 @@ Edge costs: `A-B 1, A-C 4, B-D 2, B-E 5, C-E 1, C-F 5, D-G 3, E-G 2, F-G 2`.
  
 **Greedy Best First Search**
  
-1. Start with the start node, the goal node and the heuristic value h(n) of every node.
-2. Insert the start node into a priority queue ordered by h(n).
-3. Create an empty visited set and set nodes explored to 0.
-4. Remove the node with the SMALLEST h(n) from the queue.
-5. If it is already visited, skip it and go to Step 4.
-6. Mark it as visited and increase nodes explored by 1.
-7. If it is the goal, return the path and its cost and go to Step 10.
-8. Otherwise, insert every unvisited neighbour into the queue with priority h(neighbour).
-9. Repeat Steps 4 to 8 until the queue is empty; if the goal is never reached, report failure.
-10. Stop.
+1. Start with the start node, goal node and heuristic h(n) of every node.
+2. Put the start node in a priority queue ordered by h(n); create an empty visited set.
+3. Remove the node with the SMALLEST h(n); skip it if already visited, else mark it visited.
+4. If it is the goal, return the path and cost, and go to Step 7.
+5. Add every unvisited neighbour to the queue with priority h(neighbour).
+6. Repeat Steps 3 to 5 until the queue is empty (then report failure).
+7. Record path cost, nodes explored and time. Stop.
 **A\* Search**
  
-1. Start with the start node, the goal node, edge costs and h(n).
-2. Insert the start node into a priority queue with f(start) = 0 + h(start); set best cost of start to 0.
-3. Remove the node with the SMALLEST f(n) = g(n) + h(n), where g(n) is the cost from the start.
-4. If its cost is higher than the best cost already recorded for it, discard it (outdated entry) and go to Step 3.
-5. Increase nodes explored by 1.
-6. If the node is the goal, return the path and its cost g and go to Step 9.
-7. For each neighbour, compute new g = g(node) + edge cost.
-8. If new g is lower than the best known cost of that neighbour, update its best cost and insert it into the queue with f = new g + h(neighbour). Repeat Steps 3 to 8 until the queue is empty; if the goal is never reached, report failure.
-9. Record path, cost, nodes explored and execution time and compare with Greedy.
-10. Stop.
+1. Start with the start node, goal node, edge costs and h(n); set g(start) = 0.
+2. Put the start node in a priority queue ordered by f(n) = g(n) + h(n).
+3. Remove the node with the SMALLEST f(n); discard it if a cheaper route to it is already known.
+4. If it is the goal, return the path and cost g, and go to Step 7.
+5. For each neighbour, compute new g = g(node) + edge cost.
+6. If new g is lower than the neighbour's best known cost, update it and add the neighbour with f = new g + h. Repeat Steps 3 to 6 until the queue is empty.
+7. Record path cost, nodes explored and time and compare with Greedy. Stop.
+### Advantages
+ 
+- A* is complete and optimal with an admissible heuristic.
+- Both use heuristics to explore fewer nodes than blind search.
+- Greedy is very fast and simple.
+### Disadvantages
+ 
+- Greedy is neither optimal nor always complete.
+- A* needs a good, admissible heuristic and large memory.
+- Both depend on the quality of the heuristic.
+### Applications
+ 
+- GPS navigation and route planning (A*).
+- Game AI and NPC path finding.
+- Robot motion planning.
+- Puzzle solving (8-puzzle, 15-puzzle) and network routing.
 ### Conclusion
 Greedy returned **A → C → E → G, cost 7**; A* returned **A → B → D → G, cost 6 (optimal)**. Both explored **4 nodes**, so A* gave the better answer at no extra search effort here. Greedy is quicker in general but can return a suboptimal path; A* with an admissible heuristic guarantees the least-cost path.
  
@@ -153,27 +187,41 @@ Knowledge base: facts `{fever, cough, body_pain}`; rules
  
 **Forward Chaining**
  
-1. Start with the set of known facts and the list of rules (IF conditions THEN conclusion).
-2. Take the first rule and check whether ALL its conditions are present in the known facts.
-3. If they are, and the conclusion is not already known, add the conclusion to the known facts and print that the rule fired.
-4. Move to the next rule and repeat Steps 2 and 3 for all rules.
-5. If at least one new fact was added in this pass, repeat from Step 2.
-6. If a full pass adds no new fact, no more rules can fire.
-7. Display all derived facts.
-8. Stop.
+1. Start with the known facts and the list of rules (IF conditions THEN conclusion).
+2. Take a rule and check whether ALL its conditions are in the known facts.
+3. If yes and the conclusion is new, add it to the known facts.
+4. Repeat Steps 2 and 3 for every rule in the list.
+5. If any new fact was added in this pass, go back to Step 2.
+6. If no new fact was added, no more rules can fire.
+7. Display all derived facts. Stop.
 **Backward Chaining**
  
 1. Start with the desired goal.
-2. If the goal is already a known fact, conclude that it is true and stop.
-3. If the goal is already being examined (in the visited set), return false to avoid an infinite loop; otherwise add it to the visited set.
-4. Search for a rule whose conclusion matches the goal.
-5. Identify the conditions required by that rule.
-6. Check whether those conditions are already known facts.
-7. If a condition is not known, treat it as a sub-goal and repeat Steps 2 to 6 for it.
-8. Continue until all required conditions are established or no suitable rule is found.
-9. If all conditions of some rule are satisfied, conclude that the goal is true.
-10. Otherwise, the goal cannot be established.
-11. Stop.
+2. If the goal is a known fact, conclude it is true and stop; if it is already being examined, return false (avoids loops).
+3. Search for a rule whose conclusion matches the goal.
+4. Identify the conditions required by that rule.
+5. Check whether each condition is a known fact; if not, treat it as a sub-goal and repeat from Step 2.
+6. If all conditions of some rule are established, conclude the goal is true.
+7. Otherwise, the goal cannot be established.
+8. Stop.
+### Advantages
+ 
+- Knowledge is stored as readable IF–THEN rules; decisions are explainable.
+- Easy to update by adding or editing rules.
+- Consistent and available at all times, unlike a human expert.
+- Forward chaining derives all consequences; backward chaining answers a specific goal efficiently.
+### Disadvantages
+ 
+- Knowledge acquisition from experts is slow and costly.
+- Cannot learn from data or handle uncertainty (propositional logic is true/false only).
+- Large rule bases become hard to maintain and may be slow.
+- Forward chaining may fire many irrelevant rules.
+### Applications
+ 
+- Medical diagnosis support (e.g. symptom to disease rules).
+- Troubleshooting and technical help-desk systems.
+- Loan or credit approval decisions.
+- Configuration systems, legal advice and fault diagnosis.
 ### Conclusion
 Forward chaining fired four rules and derived **flu, viral_infection, take_rest, recovery**. Backward chaining with goal `recovery` traced the same chain back to the known facts and **proved the goal**. Forward chaining is best for deriving everything that follows from the facts; backward chaining for answering a specific question.
  
@@ -203,19 +251,30 @@ To prepare the Titanic dataset for machine learning and explore it statistically
 - **Split:** 80/20 train/test so evaluation uses unseen data.
 ### Algorithm
  
-1. Start by loading the Titanic dataset (train.csv) into a DataFrame.
-2. Inspect the data using head(), tail(), info(), describe() and isna().sum().
-3. Check for duplicate rows and remove them.
-4. Fill missing Age values with the mean and missing Embarked values with the mode, and assign the results back to the DataFrame.
-5. Drop the Cabin column because most of its values are missing (687 of 891).
-6. Encode Sex using label encoding and Embarked using one-hot encoding.
-7. Drop the non-useful columns Name and Ticket.
-8. Compute the correlation matrix and display it as a heatmap.
-9. Plot a histogram of Fare and a boxplot of Age to study distribution and outliers.
-10. Standardise Age and Fare using StandardScaler.
-11. Separate the features X and the target y (Survived).
-12. Split the data into 80% training and 20% testing sets with random_state = 42.
-13. Stop.
+1. Load the Titanic dataset and inspect it (head, info, describe, isna().sum()).
+2. Remove duplicate rows.
+3. Handle missing values: fill Age with the mean, Embarked with the mode (assign back), and drop Cabin.
+4. Encode Sex (label encoding) and Embarked (one-hot); drop Name and Ticket.
+5. Perform statistical analysis: correlation matrix and heatmap.
+6. Plot a histogram of Fare and a boxplot of Age.
+7. Scale Age and Fare with StandardScaler, then split into X and y (Survived).
+8. Split into 80% training and 20% testing sets. Stop.
+### Advantages
+ 
+- Improves data quality and model accuracy.
+- Scaling and encoding make data usable by most algorithms.
+- EDA reveals patterns, outliers and relationships early.
+### Disadvantages
+ 
+- Time-consuming and needs domain judgement.
+- Imputation can introduce bias; dropping columns loses information.
+- Wrong choices (e.g. scaling before the split) can leak information.
+### Applications
+ 
+- Preparing data for any machine-learning project.
+- Survival or risk prediction models.
+- Business analytics, healthcare and finance data pipelines.
+- Data-quality auditing and reporting.
 ### Conclusion
 No duplicates were found. Cabin was dropped (687 of 891 missing); Age and Embarked were handled by mean and mode imputation. Sex was label-encoded, Embarked one-hot-encoded, Age and Fare standardised. Strongest correlations with `Survived`: **Sex (−0.54)**, **Pclass (−0.34)**, **Fare (+0.26)**. Fare is heavily right-skewed with outliers. The split gave **712 training / 179 testing** samples.
  
@@ -240,18 +299,30 @@ To implement Linear and Polynomial Regression, evaluate with MSE, MAE and R², a
 - **MSE:** mean of squared errors (penalises large errors). **MAE:** mean of absolute errors. **R²:** fraction of variance explained (1 = perfect, 0 = no better than the mean).
 ### Algorithm
  
-1. Start by loading the California Housing dataset and building a DataFrame with the target column Price.
-2. Check the shape, missing values and statistical summary.
-3. Select MedInc as the input feature X and Price as the target y.
-4. Split the data into 80% training and 20% testing sets (random_state = 42).
-5. Train a Linear Regression model on the training data and predict the test data.
-6. Calculate MSE, MAE and R² for the linear model.
-7. Transform X into degree-2 polynomial features using PolynomialFeatures.
-8. Train a second Linear Regression model on the polynomial features and predict the test data.
-9. Calculate MSE, MAE and R² for the polynomial model.
-10. Tabulate both results and plot the two fitted curves over the data.
-11. Compare the models and decide which performs better.
-12. Stop.
+1. Load the California Housing dataset and check shape, missing values and summary.
+2. Select MedInc as the input X and Price as the target y.
+3. Split the data into 80% training and 20% testing sets.
+4. Train Linear Regression on the training set and predict the test set.
+5. Create degree-2 polynomial features, train a second model and predict the test set.
+6. Calculate MSE, MAE and R² for both models.
+7. Tabulate and plot the results and compare the two models.
+8. Stop.
+### Advantages
+ 
+- Linear regression is simple, fast and interpretable.
+- Polynomial regression captures curved relationships.
+- MSE, MAE and R² give a clear measure of performance.
+### Disadvantages
+ 
+- Linear regression cannot model non-linear patterns.
+- Polynomial regression overfits at high degree and is sensitive to outliers.
+- Using one feature limits accuracy (R² ≈ 0.46 here).
+### Applications
+ 
+- House and real-estate price prediction.
+- Sales and demand forecasting.
+- Salary, medical-cost and crop-yield estimation.
+- Trend analysis in economics and engineering.
 ### Conclusion
 | Model | MSE | MAE | R² |
 |---|---|---|---|
@@ -281,18 +352,30 @@ To preprocess the data, implement Logistic Regression and KNN, evaluate them, an
 - **Metrics:** accuracy = correct/total; precision = TP/(TP+FP); recall = TP/(TP+FN); F1 = 2PR/(P+R); confusion matrix shows TP/FP/TN/FN per class.
 ### Algorithm
  
-1. Start by loading the Iris dataset.
-2. Check the shape, missing values, duplicates and class counts.
-3. Drop the Id column and separate the features X and the target y.
-4. Encode the Species labels using LabelEncoder.
-5. Standardise the features using StandardScaler.
-6. Split the data into 80% training and 20% testing sets (random_state = 42).
-7. Train a Logistic Regression model on the training data and predict the test data.
-8. Train a KNN classifier (choose k, e.g. 5) on the training data and predict the test data.
-9. For each model, calculate accuracy, confusion matrix, precision, recall and F1-score.
-10. Compare the results of the two models in a table.
-11. Select the better model and write the conclusion.
-12. Stop.
+1. Load the Iris dataset; check shape, missing values and duplicates.
+2. Drop Id, separate X and y, and encode Species with LabelEncoder.
+3. Standardise the features with StandardScaler.
+4. Split into 80% training and 20% testing sets.
+5. Train Logistic Regression and KNN (e.g. k = 5) on the training set and predict the test set.
+6. Calculate accuracy, confusion matrix, precision, recall and F1-score for both models.
+7. Compare the results in a table and select the better model.
+8. Stop.
+### Advantages
+ 
+- Logistic Regression is fast, simple and gives class probabilities.
+- KNN needs no training and handles non-linear boundaries.
+- Both work well on small, clean datasets such as Iris.
+### Disadvantages
+ 
+- Logistic Regression assumes a linear decision boundary.
+- KNN is slow on large data and sensitive to scaling and the choice of k.
+- Both are affected by irrelevant features and outliers.
+### Applications
+ 
+- Spam detection and credit-risk classification (Logistic Regression).
+- Disease prediction and customer churn.
+- Recommendation systems and image or handwriting recognition (KNN).
+- Species and pattern classification.
 ### Conclusion
 The data is clean and balanced (50 per class); petal length and petal width are strongly correlated (0.96). Preprocessing, scaling and the split are complete.
 > ⚠️ **To complete:** the code in the source PDF stops after preprocessing and plots. Run steps 5–8 and insert the Logistic Regression and KNN metric values here before submitting.
@@ -317,17 +400,30 @@ To implement both classifiers, compare them using standard metrics, and identify
 - **Naïve Bayes:** Bayes' theorem `P(C|x) ∝ P(C) · ∏ P(xᵢ|C)` assuming features are independent given the class; Gaussian variant models each feature as normal. Fast and works with small data.
 ### Algorithm
  
-1. Start by loading the Iris dataset and dropping the Id column.
-2. Separate the features X and the target y.
-3. Split the data into 80% training and 20% testing sets (random_state = 42).
-4. Create a Decision Tree classifier with max_depth = 4 and train it on the training data.
-5. Predict the test data and calculate accuracy, precision, recall and F1-score for the Decision Tree.
-6. Plot the trained tree using plot_tree().
-7. Create a Gaussian Naïve Bayes classifier and train it on the training data.
-8. Predict the test data and calculate accuracy, precision, recall and F1-score for Naïve Bayes.
-9. Build a comparison table of both models.
-10. Select the model with the highest accuracy as the most suitable model.
-11. Stop.
+1. Load the Iris dataset, drop Id and separate X and y.
+2. Split into 80% training and 20% testing sets.
+3. Train a Decision Tree (max_depth = 4) and a Gaussian Naïve Bayes model.
+4. Predict the test set with both models.
+5. Calculate accuracy, precision, recall and F1-score for both.
+6. Plot the Decision Tree and build a comparison table.
+7. Select the model with the highest accuracy as the most suitable.
+8. Stop.
+### Advantages
+ 
+- Decision Tree is easy to interpret and visualise.
+- Naïve Bayes is very fast and works with small training sets.
+- Decision Tree needs little preprocessing and no scaling.
+### Disadvantages
+ 
+- Decision Trees overfit easily and are unstable to small data changes.
+- Naïve Bayes assumes feature independence, which is rarely true.
+- Gaussian Naïve Bayes assumes normally distributed features.
+### Applications
+ 
+- Medical diagnosis and loan approval (Decision Tree).
+- Spam filtering and text/sentiment classification (Naïve Bayes).
+- Real-time prediction and document categorisation.
+- Customer segmentation and fault detection.
 ### Conclusion
 | Model | Accuracy | Precision | Recall | F1 |
 |---|---|---|---|---|
@@ -360,22 +456,32 @@ Clustering is **unsupervised**: it groups similar samples without labels.
  
 **K-Means with Elbow Method**
  
-1. Start by loading the Iris dataset and standardising the features.
-2. For k = 1 to 10, run K-Means and record the inertia (WCSS).
-3. Plot WCSS against k and choose k at the "elbow" of the curve.
-4. Select k initial centroids.
-5. Assign every point to its nearest centroid.
-6. Recompute each centroid as the mean of its assigned points.
-7. Repeat Steps 5 and 6 until the assignments no longer change.
-8. Record the cluster sizes and silhouette score.
+1. Load the Iris dataset and standardise the features.
+2. For k = 1 to 10, run K-Means and record the WCSS (inertia).
+3. Plot WCSS vs k and choose k at the elbow.
+4. Run K-Means with the chosen k (assign points to nearest centroid, update centroids until no change).
+5. Record cluster sizes and silhouette score. Stop.
 **Hierarchical Clustering with Dendrogram**
  
-9. Treat every data point as its own cluster.
-10. Merge the two closest clusters using Ward linkage and repeat until one cluster remains.
-11. Plot the dendrogram and cut it at a suitable height to get k clusters.
-12. Record the cluster sizes and silhouette score.
-13. Compare K-Means and Hierarchical clustering in a table.
-14. Stop.
+1. Treat each data point as its own cluster and merge the two closest clusters (Ward linkage) until one remains.
+2. Plot the dendrogram, cut it to get k clusters, and record cluster sizes and silhouette score.
+3. Compare both methods in a table. Stop.
+### Advantages
+ 
+- Clustering needs no labels (unsupervised).
+- K-Means is fast and scales to large data.
+- Hierarchical clustering gives a dendrogram and does not need k in advance.
+### Disadvantages
+ 
+- K-Means needs k beforehand, is sensitive to initial centroids and outliers, and assumes round clusters.
+- Hierarchical clustering is slow and memory-heavy on large data.
+- Merges in hierarchical clustering cannot be undone.
+### Applications
+ 
+- Customer segmentation in marketing.
+- Image compression and segmentation.
+- Document and news grouping.
+- Gene-expression analysis and anomaly detection.
 ### Conclusion
 Both methods indicated **k = 3**.
  
@@ -406,16 +512,31 @@ PCA is an unsupervised linear technique that finds orthogonal axes (principal co
  
 ### Algorithm
  
-1. Start by loading the Breast Cancer dataset (569 samples, 30 features).
-2. Split the data into 80% training and 20% testing sets (random_state = 42, stratified).
-3. Build a pipeline of StandardScaler followed by Logistic Regression and train it on the original 30 features.
-4. Record the test accuracy as "accuracy without PCA".
-5. Build a second pipeline of StandardScaler, PCA (retain 95% variance) and Logistic Regression and train it.
-6. Record the number of components kept, the variance retained and the test accuracy as "accuracy with PCA".
-7. Apply PCA with 2 components on the scaled data and plot a scatter plot coloured by class.
-8. Plot the cumulative explained variance against the number of components with a 95% line.
-9. Compare features and accuracy before and after PCA in a table.
-10. Stop.
+1. Load the Breast Cancer dataset (30 features) and split into 80% training and 20% testing sets.
+2. Train StandardScaler + Logistic Regression on all 30 features and record the accuracy.
+3. Apply StandardScaler + PCA (retain 95% variance) and record the number of components.
+4. Train Logistic Regression on the PCA features and record the accuracy.
+5. Apply PCA with 2 components and plot a scatter plot coloured by class.
+6. Plot cumulative explained variance with a 95% line.
+7. Compare features and accuracy before and after PCA. Stop.
+### Advantages
+ 
+- Reduces the number of features (30 → 10) and training time.
+- Removes correlated features and noise.
+- Allows 2D/3D visualisation of high-dimensional data.
+- Helps to reduce overfitting.
+### Disadvantages
+ 
+- Principal components are hard to interpret.
+- Some information is lost (4.73% of variance here).
+- Linear only; sensitive to feature scaling.
+- Does not use class labels, so components may not be the most discriminative.
+### Applications
+ 
+- Image and face recognition.
+- Gene and medical data analysis.
+- Data visualisation and noise reduction.
+- Preprocessing for machine-learning models and finance.
 ### Conclusion
 | Measure | Before PCA | After PCA |
 |---|---|---|
@@ -447,17 +568,32 @@ To implement and compare SVM, Random Forest and AdaBoost, and evaluate them befo
 - **Grid Search:** tries every hyperparameter combination, keeps the best CV score.
 ### Algorithm
  
-1. Start by loading the Breast Cancer dataset.
-2. Split the data into 80% training and 20% testing sets (stratified, random_state = 42).
-3. Define the baseline models: SVM (with StandardScaler), Random Forest and AdaBoost.
-4. Create a 5-fold stratified cross-validation object.
-5. Run cross-validation on each baseline model and record mean accuracy, precision, recall, F1 and ROC-AUC.
-6. Define a hyperparameter grid for each model (SVM: C, kernel, gamma; Random Forest: n_estimators, max_depth, min_samples_split; AdaBoost: n_estimators, learning_rate).
-7. Run GridSearchCV for each model and store the best parameters and the best estimator.
-8. Evaluate every baseline model and every tuned model on the test set using the five metrics.
-9. Compare performance before and after optimisation in a table and a bar chart.
-10. Select the best model based on the cross-validation score.
-11. Stop.
+1. Load the Breast Cancer dataset and split into 80% training and 20% testing sets (stratified).
+2. Define the baseline models: SVM (with scaling), Random Forest and AdaBoost.
+3. Run 5-fold stratified cross-validation on each and record the metrics.
+4. Define a hyperparameter grid for each model.
+5. Run GridSearchCV for each model and keep the best estimator.
+6. Evaluate baseline and tuned models on the test set (accuracy, precision, recall, F1, ROC-AUC).
+7. Compare before and after optimisation and select the best model.
+8. Stop.
+### Advantages
+ 
+- SVM is effective in high dimensions and with non-linear kernels.
+- Random Forest reduces overfitting and handles many features.
+- AdaBoost improves weak learners and often gives high accuracy.
+- Cross-validation and Grid Search give reliable estimates and better parameters.
+### Disadvantages
+ 
+- Grid Search is computationally expensive.
+- SVM is slow on very large data and needs scaling.
+- AdaBoost is sensitive to noisy data and outliers.
+- Random Forest is less interpretable.
+### Applications
+ 
+- Cancer and disease diagnosis.
+- Fraud and spam detection.
+- Image and text classification.
+- Credit scoring, customer churn and face detection.
 ### Conclusion
 | Model | Baseline CV acc | Tuned CV acc | Test acc (before → after) |
 |---|---|---|---|
