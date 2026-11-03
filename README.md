@@ -1,8 +1,8 @@
 ## AIML Practical File
 
-📄 [Click here to view AIML Practical PDF](./AIML Manual.pdf)
+📄 [Click here to view AIML Practical PDF](./AIMLManual.pdf)
 
-[Download PDF](./AIML Manual.pdf)
+[Download PDF](./AIMLManual.pdf)
 
 ## PR1: Uninformed Search – Breadth First Search (BFS)
  
